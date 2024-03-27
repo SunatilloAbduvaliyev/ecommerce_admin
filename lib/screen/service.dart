@@ -1,17 +1,5 @@
-import 'package:admin_ecommerce/screen/tab/home/home_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
-import 'dart:async';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
-
-Future<void> configureLocalTimeZone() async {
-  tz.initializeTimeZones();
-  final String timeZoneName = await FlutterTimezone.getLocalTimezone();
-  tz.setLocalLocation(tz.getLocation(timeZoneName));
-}
 class LocalNotificationService {
   static final LocalNotificationService localNotificationService =
   LocalNotificationService._();
@@ -25,33 +13,26 @@ class LocalNotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
-  void init(GlobalKey<NavigatorState> navigatorKey) async {
-    // Android
+  void init() async {
     const AndroidInitializationSettings androidInitializationSettings =
     AndroidInitializationSettings("app_icon");
 
-    //IOS
     final DarwinInitializationSettings initializationSettingsDarwin =
     DarwinInitializationSettings(
       onDidReceiveLocalNotification: onDidReceiveLocalNotification,
     );
 
     InitializationSettings initializationSettings = InitializationSettings(
-        iOS: initializationSettingsDarwin,
-        android: androidInitializationSettings);
+      iOS: initializationSettingsDarwin,
+      android: androidInitializationSettings,
+    );
 
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: (notification) {
-          if (notification.payload != null) {
-            Navigator.push(navigatorKey.currentContext!,
-                MaterialPageRoute(builder: (context) {
-                  return const HomeScreen();
-                }));
-          }
-          print(notification.payload);
-        });
+    flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveBackgroundNotificationResponse: (notification) {},
+    );
 
-    await flutterLocalNotificationsPlugin
+    final bool? result = await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
         IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
@@ -59,7 +40,6 @@ class LocalNotificationService {
       badge: true,
       sound: true,
     );
-    tz.initializeTimeZones();
   }
 
   @pragma('vm:entry-point')
@@ -67,6 +47,7 @@ class LocalNotificationService {
     print("TAPPED FROM BACKGROUND");
   }
 
+  //channel
   AndroidNotificationChannel androidNotificationChannel =
   const AndroidNotificationChannel(
     "my_channel",
@@ -85,63 +66,15 @@ class LocalNotificationService {
     print(payload);
   }
 
-  void showNotification({
+  void showNatification({
     required String title,
     required String body,
     required int id,
   }) {
     flutterLocalNotificationsPlugin.show(
-        id,
-        title,
-        body,
-        NotificationDetails(
-            android: AndroidNotificationDetails(
-              androidNotificationChannel.id,
-              androidNotificationChannel.name,
-              priority: Priority.max,
-              playSound: true,
-              icon: "ico.png",
-              showProgress: true,
-              largeIcon: const DrawableResourceAndroidBitmap('ico.png'),
-            ),
-            iOS: DarwinNotificationDetails(
-              subtitle: title,
-              presentAlert: true,
-              presentSound: true,
-              interruptionLevel: InterruptionLevel.active,
-            )),
-        payload: "news_screen");
-    debugPrint("CURRENT NOTIFICATION ID:$id");
-  }
-
-  void scheduleNotification({
-    required String title,
-    required String body,
-    required int delayedTime,
-  }) async {
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        123,
-        'scheduled alarm clock title',
-        'scheduled alarm clock body',
-        tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
-        const NotificationDetails(
-            android: AndroidNotificationDetails(
-                'alarm_clock_channel', 'Alarm Clock Channel',
-                channelDescription: 'Alarm Clock Notification')),
-        androidScheduleMode: AndroidScheduleMode.alarmClock,
-        uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime);
-  }
-
-  void showPeriodicNotification({
-    required String title,
-    required String body,
-  }) {
-    flutterLocalNotificationsPlugin.periodicallyShow(
-      2,
+      id,
       title,
       body,
-      RepeatInterval.everyMinute,
       NotificationDetails(
         android: AndroidNotificationDetails(
           androidNotificationChannel.id,
@@ -156,11 +89,11 @@ class LocalNotificationService {
     );
   }
 
-  cancelNotification(int id) {
-    flutterLocalNotificationsPlugin.cancel(id);
+  void cancelAllNotifications() {
+    flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  cancelAll() {
-    flutterLocalNotificationsPlugin.cancelAll();
+  void cancelNotificationById(int id) {
+    flutterLocalNotificationsPlugin.cancel(id);
   }
 }

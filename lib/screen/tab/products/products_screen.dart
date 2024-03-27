@@ -79,7 +79,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             IconButton(
                                 onPressed: (){
                                   context.read<ProductViewModel>().deleteProduct(productList[index].docId!, context);
-                                  LocalNotificationService().showNotification(
+                                  LocalNotificationService().showNatification(
                                     title: "Product deleted",
                                     body: "Ma'lumot saqlandi",
                                     id: 522,

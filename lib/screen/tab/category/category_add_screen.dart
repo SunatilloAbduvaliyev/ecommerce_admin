@@ -66,7 +66,9 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
     descriptionController.dispose();
     super.dispose();
   }
+
   int id = 0;
+
   @override
   Widget build(BuildContext context) {
     debugPrint("------------------------------------------build runa");
@@ -168,7 +170,8 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                                     image: imageUrl[active],
                                   ),
                                   context);
-                              LocalNotificationService.localNotificationService.showNotification(
+                              LocalNotificationService.localNotificationService
+                                  .showNatification(
                                 title: "Category saqlandi buldi",
                                 body: "Ma'lumotlar saqlandi",
                                 id: id,
@@ -188,7 +191,8 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                                         : widget.renameCategory.image,
                                   ),
                                   context);
-                              LocalNotificationService.localNotificationService.showNotification(
+                              LocalNotificationService.localNotificationService
+                                  .showNatification(
                                 title: "Category update buldi",
                                 body: "Ma'lumotlar saqlandi",
                                 id: id,
@@ -211,7 +215,8 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                                     categoryId: widget.renameCategory.docId,
                                   ),
                                   context);
-                              LocalNotificationService.localNotificationService.showNotification(
+                              LocalNotificationService.localNotificationService
+                                  .showNatification(
                                 title: "Product saqlandi buldi",
                                 body: "Ma'lumotlar saqlandi",
                                 id: id,
@@ -220,24 +225,25 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                               Navigator.of(context).pop();
                             }
                           } else {
-                            if (formKey.currentState!.validate()) {
-                              context.read<ProductViewModel>().updateProduct(
+                            context.read<ProductViewModel>().updateProduct(
                                   ProductModel(
+                                      docId: widget.productModel!.docId,
                                       title: titleController.text,
                                       description: descriptionController.text,
                                       image: active != -1
                                           ? imageUrl[active]
-                                          : widget.renameCategory.image,
+                                          : widget.productModel!.image,
                                       price: priceController.text),
-                                  context);
-                              LocalNotificationService.localNotificationService.showNotification(
-                                title: "Product update buldi",
-                                body: "Ma'lumotlar saqlandi",
-                                id: id,
-                              );
-                              id++;
-                              Navigator.of(context).pop();
-                            }
+                                  context,
+                                );
+                            LocalNotificationService.localNotificationService
+                                .showNatification(
+                              title: "Product update buldi",
+                              body: "Ma'lumotlar saqlandi",
+                              id: id,
+                            );
+                            id++;
+                            Navigator.of(context).pop();
                           }
                         },
                 )
