@@ -20,7 +20,7 @@ class ProductModel {
         description: json["description"] as String? ?? '',
         price: json["price"] as String? ?? '',
         categoryId: json["category_id"] as String? ?? '',
-        docId: json["doc_id"] as String? ?? '',
+        docId: json["id"] as String? ?? '',
         image: json["image"] as String? ?? '',
       );
 
@@ -29,7 +29,7 @@ class ProductModel {
         "description": description,
         "price": price,
         "category_id": categoryId,
-        "doc_id": " ",
+        "id": " ",
         "image": image
       };
 

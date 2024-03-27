@@ -8,7 +8,9 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/model/category_model/category_model.dart';
+import '../../../data/model/product_model/product_model.dart';
 import '../../../utils/images/app_images.dart';
+import 'category_add_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -29,13 +31,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
           actions: [
             IconButton(
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    RouteName.categoryAddScreen,
-                    arguments: {
-                      'categoryModel': CategoryModel.initialValue,
-                      'isAddProduct': true,
-                    },
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context)=>CategoryAddScreen(
+                        isAddProduct: true,
+                        productModel: ProductModel.initialValue,
+                        renameCategory: CategoryModel.initialValue,
+                      ))
                   );
                 },
                 icon: const Icon(
@@ -132,16 +134,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           child: categoryButton(
                             category: category,
                             onTab: () {
-                              Navigator.pushNamed(
-                                context,
-                                RouteName.categoryAddScreen,
-                                arguments: {
-                                  'categoryModel': category,
-                                  'isAddProduct': false,
-                                },
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context)=>CategoryAddScreen(
+                                    isAddProduct: false,
+                                    productModel: ProductModel.initialValue,
+                                    renameCategory: category,
+                                  ))
                               );
                             },
                           ),
+
                         );
                       },
                     );

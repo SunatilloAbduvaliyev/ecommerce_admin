@@ -4,21 +4,26 @@ import 'package:admin_ecommerce/screen/tab/category/view_model/category_view_mod
 import 'package:admin_ecommerce/screen/tab/category/widget/add_button.dart';
 import 'package:admin_ecommerce/screen/tab/category/widget/image_dialog.dart';
 import 'package:admin_ecommerce/screen/tab/category/widget/text_field.dart';
+import 'package:admin_ecommerce/screen/tab/products/view_model/product_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import '../../../data/model/product_model/product_model.dart';
 import '../../../utils/color/app_colors.dart';
 import '../../../utils/images/app_images.dart';
+import '../../service.dart';
 
 class CategoryAddScreen extends StatefulWidget {
   const CategoryAddScreen({
     super.key,
     required this.renameCategory,
     required this.isAddProduct,
+    this.productModel,
   });
 
   final CategoryModel renameCategory;
   final bool isAddProduct;
+  final ProductModel? productModel;
 
   @override
   State<CategoryAddScreen> createState() => _CategoryAddScreenState();
@@ -40,6 +45,12 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
       descriptionController =
           TextEditingController(text: widget.renameCategory.description);
       image = widget.renameCategory.image;
+    } else {
+      titleController = TextEditingController(text: widget.productModel!.title);
+      descriptionController =
+          TextEditingController(text: widget.productModel!.description);
+      image = widget.productModel!.image;
+      priceController = TextEditingController(text: widget.productModel!.price);
     }
   }
 
@@ -55,7 +66,7 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
     descriptionController.dispose();
     super.dispose();
   }
-
+  int id = 0;
   @override
   Widget build(BuildContext context) {
     debugPrint("------------------------------------------build runa");
@@ -124,10 +135,12 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                           isTitle: true,
                           controller: titleController,
                         ),
-                        widget.isAddProduct?const SizedBox():textField(
-                          title: "Price",
-                          controller: priceController,
-                        ),
+                        widget.isAddProduct
+                            ? const SizedBox()
+                            : textField(
+                                title: "Price",
+                                controller: priceController,
+                              ),
                         textField(
                           title: "Description",
                           controller: descriptionController,
@@ -140,37 +153,94 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                   height: 50.h,
                 ),
                 addButton(
-                    title: widget.renameCategory.title.isEmpty
-                        ? 'Add Categories'
-                        : 'Rename Categories',
-                    onTap: () {
-                      if (widget.renameCategory.title.isEmpty) {
-                        if (formKey.currentState!.validate() && active != -1) {
-                          context.read<CategoryViewModel>().insertCategory(
-                              CategoryModel(
-                                title: titleController.text,
-                                description: descriptionController.text,
-                                image: imageUrl[active],
-                              ),
-                              context);
-                          Navigator.of(context).pop();
+                  title: widget.renameCategory.title.isEmpty
+                      ? 'Add Categories'
+                      : 'Rename Categories',
+                  onTap: widget.isAddProduct
+                      ? () {
+                          if (widget.renameCategory.title.isEmpty) {
+                            if (formKey.currentState!.validate() &&
+                                active != -1) {
+                              context.read<CategoryViewModel>().insertCategory(
+                                  CategoryModel(
+                                    title: titleController.text,
+                                    description: descriptionController.text,
+                                    image: imageUrl[active],
+                                  ),
+                                  context);
+                              LocalNotificationService.localNotificationService.showNotification(
+                                title: "Category saqlandi buldi",
+                                body: "Ma'lumotlar saqlandi",
+                                id: id,
+                              );
+                              id++;
+                              Navigator.of(context).pop();
+                            }
+                          } else {
+                            if (formKey.currentState!.validate()) {
+                              context.read<CategoryViewModel>().updateCategory(
+                                  CategoryModel(
+                                    docId: widget.renameCategory.docId,
+                                    title: titleController.text,
+                                    description: descriptionController.text,
+                                    image: active != -1
+                                        ? imageUrl[active]
+                                        : widget.renameCategory.image,
+                                  ),
+                                  context);
+                              LocalNotificationService.localNotificationService.showNotification(
+                                title: "Category update buldi",
+                                body: "Ma'lumotlar saqlandi",
+                                id: id,
+                              );
+                              id++;
+                              Navigator.of(context).pop();
+                            }
+                          }
                         }
-                      } else {
-                        if (formKey.currentState!.validate()) {
-                          context.read<CategoryViewModel>().updateCategory(
-                              CategoryModel(
-                                docId: widget.renameCategory.docId,
-                                title: titleController.text,
-                                description: descriptionController.text,
-                                image: active != -1
-                                    ? imageUrl[active]
-                                    : widget.renameCategory.image,
-                              ),
-                              context);
-                          Navigator.of(context).pop();
-                        }
-                      }
-                    })
+                      : () {
+                          if (widget.productModel!.title.isEmpty) {
+                            if (formKey.currentState!.validate() &&
+                                active != -1) {
+                              context.read<ProductViewModel>().insertProduct(
+                                  ProductModel(
+                                    title: titleController.text,
+                                    description: descriptionController.text,
+                                    image: imageUrl[active],
+                                    price: priceController.text,
+                                    categoryId: widget.renameCategory.docId,
+                                  ),
+                                  context);
+                              LocalNotificationService.localNotificationService.showNotification(
+                                title: "Product saqlandi buldi",
+                                body: "Ma'lumotlar saqlandi",
+                                id: id,
+                              );
+                              id++;
+                              Navigator.of(context).pop();
+                            }
+                          } else {
+                            if (formKey.currentState!.validate()) {
+                              context.read<ProductViewModel>().updateProduct(
+                                  ProductModel(
+                                      title: titleController.text,
+                                      description: descriptionController.text,
+                                      image: active != -1
+                                          ? imageUrl[active]
+                                          : widget.renameCategory.image,
+                                      price: priceController.text),
+                                  context);
+                              LocalNotificationService.localNotificationService.showNotification(
+                                title: "Product update buldi",
+                                body: "Ma'lumotlar saqlandi",
+                                id: id,
+                              );
+                              id++;
+                              Navigator.of(context).pop();
+                            }
+                          }
+                        },
+                )
               ],
             ),
           ),
