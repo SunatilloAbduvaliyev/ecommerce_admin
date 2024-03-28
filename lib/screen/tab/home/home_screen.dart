@@ -1,3 +1,4 @@
+import 'package:admin_ecommerce/screen/permission.dart';
 import 'package:admin_ecommerce/screen/tab/category/view_model/category_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -18,6 +19,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PermissionsScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.arrow_forward_ios)
+          )
+        ],
+      ),
         body: StreamBuilder<List<CategoryModel>>(
       stream: context.read<CategoryViewModel>().getAllCategories(),
       builder: (BuildContext context, snapshot) {

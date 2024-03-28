@@ -3,6 +3,7 @@ import 'package:admin_ecommerce/screen/tab/category/view_model/category_view_mod
 import 'package:admin_ecommerce/screen/tab/products/view_model/product_view_model.dart';
 import 'package:admin_ecommerce/screen/tab/tab_box_screen.dart';
 import 'package:admin_ecommerce/utils/color/app_colors.dart';
+import 'package:admin_ecommerce/view_model/image_view_model/image_view_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +22,7 @@ Future<void> main()async{
       providers: [
         ChangeNotifierProvider(create: (_) => CategoryViewModel()),
         ChangeNotifierProvider(create: (_) => ProductViewModel()),
+        ChangeNotifierProvider(create: (_) => ImageViewModel()),
       ],
       child: const MyApp(),
     )

@@ -1,16 +1,16 @@
-import 'package:admin_ecommerce/data/image_repository.dart';
 import 'package:admin_ecommerce/data/model/category_model/category_model.dart';
 import 'package:admin_ecommerce/screen/tab/category/view_model/category_view_model.dart';
 import 'package:admin_ecommerce/screen/tab/category/widget/add_button.dart';
-import 'package:admin_ecommerce/screen/tab/category/widget/image_dialog.dart';
 import 'package:admin_ecommerce/screen/tab/category/widget/text_field.dart';
 import 'package:admin_ecommerce/screen/tab/products/view_model/product_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../data/model/product_model/product_model.dart';
 import '../../../utils/color/app_colors.dart';
 import '../../../utils/images/app_images.dart';
+import '../../../view_model/image_view_model/image_view_model.dart';
 import '../../service.dart';
 
 class CategoryAddScreen extends StatefulWidget {
@@ -68,6 +68,10 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
   }
 
   int id = 0;
+  final ImagePicker picker = ImagePicker();
+
+  String imageUrl = "";
+  String storagePath = "";
 
   @override
   Widget build(BuildContext context) {
@@ -96,27 +100,34 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                           ),
                           child: InkWell(
                             onTap: () {
-                              showImageDialog(
-                                activeIndex: (value) {
-                                  active = value;
-                                  debugPrint('------------------------$active');
-                                },
-                                imageChanged: (images) {
-                                  setState(() {
-                                    categoryModel.copyWith(
-                                      image: image,
-                                    );
-                                    image = images;
-                                    debugPrint(
-                                        '------------------------$image');
-                                  });
-                                },
-                                active: active,
+                              showDialog(
                                 context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                      title: Column(
+                                    children: [
+                                      TextButton(
+                                        onPressed: () async {
+                                          await _getImageFromGallery();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Galery'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          await _getImageFromCamera();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Camera'),
+                                      )
+                                    ],
+                                  ));
+                                },
                               );
                             },
                             borderRadius: BorderRadius.circular(16.r),
-                            child: image.isEmpty
+                            child:context.watch<ImageViewModel>().getLoader?const CircularProgressIndicator():
+                                imageUrl.isEmpty
                                 ? Center(
                                     child: Image.asset(
                                       AppImages.downloadImage,
@@ -126,7 +137,7 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                                 : ClipRRect(
                                     borderRadius: BorderRadius.circular(16.r),
                                     child: Image.network(
-                                      image,
+                                      imageUrl,
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -253,5 +264,41 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _getImageFromCamera() async {
+    XFile? image = await picker.pickImage(
+      source: ImageSource.camera,
+      maxHeight: 200,
+      maxWidth: double.infinity,
+    );
+    if (image != null && context.mounted) {
+      debugPrint("IMAGE PATH:${image.path}");
+      storagePath = "files/images/${image.name}";
+      imageUrl = await context.read<ImageViewModel>().uploadImage(
+            pickedFile: image,
+            storagePath: storagePath,
+          );
+
+      debugPrint("DOWNLOAD URL:$imageUrl");
+    }
+  }
+
+  Future<void> _getImageFromGallery() async {
+    XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 200,
+      maxWidth: double.infinity,
+    );
+    if (image != null && context.mounted) {
+      debugPrint("IMAGE PATH:${image.path}");
+      storagePath = "files/images/${image.name}";
+      imageUrl = await context.read<ImageViewModel>().uploadImage(
+            pickedFile: image,
+            storagePath: storagePath,
+          );
+
+      debugPrint("DOWNLOAD URL:$imageUrl");
+    }
   }
 }
