@@ -24,6 +24,7 @@ categoryButton({
             leading: Image.network(
               category.image,
               fit: BoxFit.cover,
+              width: 100,
             ),
             title: Text(
               category.title,

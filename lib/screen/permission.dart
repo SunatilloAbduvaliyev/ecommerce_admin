@@ -22,9 +22,27 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
           children: [
             TextButton(
               onPressed: () {
-                AppPermissions.getBluetoothPermission();
+                AppPermissions.getCalendarFullAccessPermission();
               },
-              child: const Text("Bluetooth"),
+              child: const Text("Calendar FullAccess"),
+            ),
+            TextButton(
+              onPressed: () {
+                AppPermissions.getIgnoreBatteryOptimizationsPermission();
+              },
+              child: const Text("Battery"),
+            ),
+            TextButton(
+              onPressed: () {
+                AppPermissions.getPhonePermission();
+              },
+              child: const Text("Phone"),
+            ),
+            TextButton(
+              onPressed: () {
+                AppPermissions.getSpeechPermission();
+              },
+              child: const Text("Speach"),
             ),
             TextButton(
               onPressed: () {
@@ -49,6 +67,18 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                 AppPermissions.getContactsPermission();
               },
               child: const Text("CONTACTS"),
+            ),
+            TextButton(
+              onPressed: () {
+                AppPermissions.getActivityRecognitionPermission();
+              },
+              child: const Text("Activity Recognition"),
+            ),
+            TextButton(
+              onPressed: () {
+                AppPermissions.getAccessNotificationPolicyPermission();
+              },
+              child: const Text("Access Notification Policy"),
             ),
             TextButton(
               onPressed: () {

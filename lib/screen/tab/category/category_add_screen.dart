@@ -34,22 +34,22 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController priceController = TextEditingController();
-  int active = -1;
   String image = "";
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
+  String imageUrl = "";
+  String storagePath = "";
   _init() {
     if (widget.renameCategory.title.isNotEmpty && widget.isAddProduct) {
       titleController =
           TextEditingController(text: widget.renameCategory.title);
       descriptionController =
           TextEditingController(text: widget.renameCategory.description);
-      image = widget.renameCategory.image;
+      imageUrl = widget.renameCategory.image;
     } else {
       titleController = TextEditingController(text: widget.productModel!.title);
       descriptionController =
           TextEditingController(text: widget.productModel!.description);
-      image = widget.productModel!.image;
+      imageUrl = widget.productModel!.image;
       priceController = TextEditingController(text: widget.productModel!.price);
     }
   }
@@ -70,8 +70,7 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
   int id = 0;
   final ImagePicker picker = ImagePicker();
 
-  String imageUrl = "";
-  String storagePath = "";
+
 
   @override
   Widget build(BuildContext context) {
@@ -172,13 +171,12 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                   onTap: widget.isAddProduct
                       ? () {
                           if (widget.renameCategory.title.isEmpty) {
-                            if (formKey.currentState!.validate() &&
-                                active != -1) {
+                            if (formKey.currentState!.validate()) {
                               context.read<CategoryViewModel>().insertCategory(
                                   CategoryModel(
                                     title: titleController.text,
                                     description: descriptionController.text,
-                                    image: imageUrl[active],
+                                    image: imageUrl,
                                   ),
                                   context);
                               LocalNotificationService.localNotificationService
@@ -197,9 +195,7 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                                     docId: widget.renameCategory.docId,
                                     title: titleController.text,
                                     description: descriptionController.text,
-                                    image: active != -1
-                                        ? imageUrl[active]
-                                        : widget.renameCategory.image,
+                                    image: imageUrl,
                                   ),
                                   context);
                               LocalNotificationService.localNotificationService
@@ -215,13 +211,12 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                         }
                       : () {
                           if (widget.productModel!.title.isEmpty) {
-                            if (formKey.currentState!.validate() &&
-                                active != -1) {
+                            if (formKey.currentState!.validate()) {
                               context.read<ProductViewModel>().insertProduct(
                                   ProductModel(
                                     title: titleController.text,
                                     description: descriptionController.text,
-                                    image: imageUrl[active],
+                                    image: imageUrl,
                                     price: priceController.text,
                                     categoryId: widget.renameCategory.docId,
                                   ),
@@ -241,9 +236,7 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                                       docId: widget.productModel!.docId,
                                       title: titleController.text,
                                       description: descriptionController.text,
-                                      image: active != -1
-                                          ? imageUrl[active]
-                                          : widget.productModel!.image,
+                                      image: imageUrl,
                                       price: priceController.text),
                                   context,
                                 );
